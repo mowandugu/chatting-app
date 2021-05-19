@@ -37,6 +37,19 @@ app.route('/').get((req, res) => {
   });
 });
 
+//Serialize user object
+
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+passport.deserializeUser((id, done) => {
+  // myDataBase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
+  done(null, null);
+  // });
+});
+
+//end of serialization
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Listening on port ' + PORT);
