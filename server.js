@@ -15,7 +15,7 @@ const passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo');
 const URI = process.env.MONGO_URI;
-const store = MongoStore.create({ mongoUrl: URI })
+const store = MongoStore.create({ mongoUrl: URI });
 
 app.set('view engine', 'pug');
 
@@ -56,13 +56,20 @@ myDB(async (client) => {
   let currentUsers = 0;
   io.on('connection', (socket) => {
     ++currentUsers;
-    io.emit('user count', currentUsers);
-    console.log('user ' + socket.request.user.username + ' connected');
-
+    io.emit('user', {
+      name: socket.request.user.name,
+      currentUsers,
+      connected: true
+    });
+    console.log('A user has connected');
     socket.on('disconnect', () => {
       console.log('A user has disconnected');
       --currentUsers;
-      io.emit('user count', currentUsers);
+      io.emit('user', {
+        name: socket.request.user.name,
+        currentUsers,
+        connected: false
+      });
     });
   });
 }).catch((e) => {
@@ -86,3 +93,6 @@ function onAuthorizeFail(data, message, error, accept) {
 http.listen(process.env.PORT || 3000, () => {
   console.log('Listening on port ' + process.env.PORT);
 });
+
+
+
